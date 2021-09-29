@@ -2,29 +2,25 @@ package main
 
 import "fmt"
 
-func left(bridge *chan int, carNumber int) {
+func leftNoSync(carNumber int, hasCar *bool) {
 	fmt.Printf("ARRIVE: Car %d is waiting your time at L side\n", carNumber)
-	_ = <- *bridge
 	fmt.Printf("CROSSING: Car %d is crossing the bridge starting from L side\n", carNumber)
-
-	*bridge <- 1
-
+	if *hasCar { fmt.Printf("**************** COLISION DETECTED (%d) ****************\n", carNumber) }
+	*hasCar = true
 	fmt.Printf("FINISHED: Car %d finished to cross the bridge starting from L side\n", carNumber)
+	*hasCar = false
 }
 
-func right(bridge *chan int, carNumber int) {
+func rightNoSync(carNumber int, hasCar *bool) {
 	fmt.Printf("ARRIVE: Car %d is waiting your time at R side\n", carNumber)
-	_ = <- *bridge
 	fmt.Printf("CROSSING: Car %d is crossing the bridge starting from R side\n", carNumber)
-
-	*bridge <- 1
+	if *hasCar { fmt.Printf("**************** COLISION DETECTED (%d) ****************\n", carNumber) }
+	*hasCar = true
 	fmt.Printf("FINISHED: Car %d finished to cross the bridge starting from R side\n", carNumber)
+	*hasCar = false
 }
 
 func main() {
-	bridge := make(chan int, 1)
-	bridge <- 1
-
 	println("Enter the number of car on the right side of the bridge:")
 	var carrosDireita int
 	_, _ = fmt.Scan(&carrosDireita)
@@ -33,12 +29,15 @@ func main() {
 	var carrosEsquerda int
 	_, _ = fmt.Scan(&carrosEsquerda)
 
+	var hasCar bool
+	hasCar = false
+
 	for i := 0; i < carrosDireita; i++ {
-		go right(&bridge, i)
+		go rightNoSync(i, &hasCar)
 	}
 
 	for i := 0; i < carrosEsquerda; i++ {
-		go left(&bridge, i)
+		go leftNoSync(i, &hasCar)
 	}
 
 	_,_ = fmt.Scanln()

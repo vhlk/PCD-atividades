@@ -2,23 +2,12 @@ package main
 
 import "fmt"
 
-func left(bridge *chan int, carNumber int) {
-	fmt.Printf("ARRIVE: Car %d is waiting your time at L side\n", carNumber)
+func crossBridge(bridge *chan int, carNumber int, sideLetter byte) {
+	fmt.Printf("ARRIVE: Car %d is waiting your time at %c side\n", carNumber, sideLetter)
 	_ = <- *bridge
-	fmt.Printf("CROSSING: Car %d is crossing the bridge starting from L side\n", carNumber)
-
+	fmt.Printf("CROSSING: Car %d is crossing the bridge starting from %c side\n", carNumber, sideLetter)
 	*bridge <- 1
-
-	fmt.Printf("FINISHED: Car %d finished to cross the bridge starting from L side\n", carNumber)
-}
-
-func right(bridge *chan int, carNumber int) {
-	fmt.Printf("ARRIVE: Car %d is waiting your time at R side\n", carNumber)
-	_ = <- *bridge
-	fmt.Printf("CROSSING: Car %d is crossing the bridge starting from R side\n", carNumber)
-
-	*bridge <- 1
-	fmt.Printf("FINISHED: Car %d finished to cross the bridge starting from R side\n", carNumber)
+	fmt.Printf("FINISHED: Car %d finished to cross the bridge starting from %c side\n", carNumber, sideLetter)
 }
 
 func main() {
@@ -33,13 +22,9 @@ func main() {
 	var carrosEsquerda int
 	_, _ = fmt.Scan(&carrosEsquerda)
 
-	for i := 0; i < carrosDireita; i++ {
-		go right(&bridge, i)
-	}
+	for i := 0; i < carrosDireita; i++ { go crossBridge(&bridge, i, 'R') }
 
-	for i := 0; i < carrosEsquerda; i++ {
-		go left(&bridge, i)
-	}
+	for i := 0; i < carrosEsquerda; i++ { go crossBridge(&bridge, i, 'L') }
 
 	_,_ = fmt.Scanln()
 }

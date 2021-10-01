@@ -1,6 +1,9 @@
 package main
 
+import "bufio"
 import "fmt"
+import "os"
+import "strconv"
 
 func crossBridge(bridge *chan int, carNumber int, sideLetter byte) {
 	fmt.Printf("ARRIVE: Car %d is waiting your time at %c side\n", carNumber, sideLetter)
@@ -11,16 +14,18 @@ func crossBridge(bridge *chan int, carNumber int, sideLetter byte) {
 }
 
 func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+
 	bridge := make(chan int, 1)
 	bridge <- 1
 
 	println("Enter the number of car on the right side of the bridge:")
-	var carrosDireita int
-	_, _ = fmt.Scan(&carrosDireita)
+	scanner.Scan()
+	carrosDireita, _ := strconv.Atoi(scanner.Text())
 
 	println("Enter the number of car on the left side of the bridge:")
-	var carrosEsquerda int
-	_, _ = fmt.Scan(&carrosEsquerda)
+	scanner.Scan()
+	carrosEsquerda, _ := strconv.Atoi(scanner.Text())
 
 	for i := 0; i < carrosDireita; i++ { go crossBridge(&bridge, i, 'R') }
 

@@ -8,11 +8,6 @@ import (
 	"time"
 )
 
-type ISushiBar interface {
-	chegou()
-	saiu()
-}
-
 type SushiBar chan struct {}
 
 func NewSushiBar(n int) *SushiBar {
@@ -30,7 +25,7 @@ func (sb *SushiBar) saiu(id int) {
 func (sb *SushiBar) chegou(id int) {
 	fmt.Printf("Chegou o %d e ta esperando\n", id)
 	*sb <- struct {}{}
-	fmt.Printf("O %d entrou\n", id)
+	fmt.Printf("O %d está comendo\n", id)
 	sb.saiu(id)
 }
 

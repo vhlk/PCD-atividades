@@ -15,22 +15,42 @@ type PCond struct {
 	capacity int
 	queue []string
 	produzido int
+	ongoingProduction bool
 }
 
 func (pcond *PCond) consumir(id string) int {
 	defer pcond.condCons.L.Unlock()
 
 	pcond.condCons.L.Lock()
-	pcond.condProd.Broadcast()
+
+	// verificamos se a chegamos no limite de consumidores possíveis (capacity)
 	for len(pcond.queue) == pcond.capacity {
 		println("A fila está cheia, não recebendo novos consumidores!")
+		pcond.condProd.Broadcast()
 		return -1
 	}
+
+	// vamos inserir o consumidor na fila e avisar ao produtor
 	pcond.queue = append(pcond.queue, id)
 	fmt.Printf("O consumidor %s está esperando a produção\n", id)
+	pcond.condProd.Broadcast()
 	pcond.condCons.Wait()
 
 	fmt.Printf("O consumidor %s consumiu %d\n", id, pcond.produzido)
+
+	// como pedido na aula, removemos o consumidor na medida que for sendo consumido (1 por vez)
+	for i := 0; i < len(pcond.queue); i++ {
+		if pcond.queue[i] == id {
+			pcond.queue = RemoveIndex(pcond.queue, i)
+			break
+		}
+	}
+
+	// se o último tiver sido consumido, acabou a produção
+	if len(pcond.queue) == 0 {
+		pcond.ongoingProduction = false
+	}
+
 	return pcond.produzido
 }
 
@@ -39,13 +59,22 @@ func (pcond *PCond) produzir(n int) {
 
 	pcond.condProd.L.Lock()
 
-	for len(pcond.queue) == 0 {
+	// verificar se já tem um valor produzido
+	if pcond.ongoingProduction {
+		println("O produtor já está cheio, tente novamente mais tarde...")
+		return
+	}
+
+	pcond.ongoingProduction = true
+
+	// se não tiver consumidores, esperamos
+	if len(pcond.queue) == 0 {
 		fmt.Printf("O produtor com valor %d está bloqueado\n", n)
 		pcond.condProd.Wait()
 	}
+
+	// produzimos n e avisamos ao consumidor
 	pcond.produzido = n
-	var newQueue []string
-	pcond.queue = newQueue
 	pcond.condCons.Broadcast()
 }
 
@@ -55,7 +84,7 @@ func main() {
 	muProd := sync.Mutex{}
 	condProd := sync.NewCond(&muProd)
 	var myQueue []string
-	PC := PCond{condCons, condProd, 10, myQueue, -1}
+	PC := PCond{condCons, condProd, 10, myQueue, -1, false}
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -78,4 +107,8 @@ func main() {
 			println("Comand not recognized")
 		}
 	}
+}
+
+func RemoveIndex(s []string, index int) []string {
+	return append(s[:index], s[index+1:]...)
 }

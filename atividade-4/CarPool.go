@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -16,17 +17,18 @@ type CarPool struct {
 	isRunning      bool
 	passengers     []*Passenger
 	passengerMutex *sync.Mutex
-	cond2Arrive    *sync.Cond
-	cond2Leave     *sync.Cond
+	mu2Arrive      *sync.Mutex
+	mu2Leave       *sync.Mutex
 	condRun        *sync.Cond
 }
 
 func (cp *CarPool) load() {
-	cp.cond2Arrive.Broadcast()
+	cp.mu2Arrive.Unlock()
 }
 
 func (cp *CarPool) run() {
 	defer cp.condRun.L.Unlock()
+
 	cp.condRun.L.Lock()
 
 	for cp.arrived < cp.capacity {
@@ -37,11 +39,16 @@ func (cp *CarPool) run() {
 	println("Corridinhaaaaa")
 	time.Sleep(1 * time.Second)
 
+	cp.mu2Arrive.Lock()
+	cp.mu2Leave.Lock()
+
+	cp.arrived = 0
+
 	cp.unload()
 }
 
 func (cp *CarPool) unload() {
-	cp.cond2Leave.Broadcast()
+	cp.mu2Leave.Unlock()
 }
 
 type Passenger struct {
@@ -51,11 +58,18 @@ type Passenger struct {
 
 func (pass *Passenger) board() {
 	if pass.cp.isRunning {
-		println("Carro em movimento, não é possível entrar!")
+		println("Car is on his way, it is not possible to get in!")
 		return
 	}
 
-	pass.cp.cond2Arrive.Wait()
+	fmt.Printf("Passenger %s is trying to get in\n", pass.id)
+	pass.cp.mu2Arrive.Lock()
+
+	if pass.cp.arrived >= pass.cp.capacity {
+		println("The car is full! Entering is not possible")
+		pass.cp.mu2Arrive.Unlock()
+		return
+	}
 
 	pass.cp.passengerMutex.Lock()
 	pass.cp.passengers = append(pass.cp.passengers, pass)
@@ -63,15 +77,19 @@ func (pass *Passenger) board() {
 
 	pass.cp.arrived++
 
-	pass.cp.cond2Arrive.L.Unlock()
+	fmt.Printf("Passenger %s entered\n", pass.id)
 
 	pass.cp.condRun.Broadcast()
+
+	pass.cp.mu2Arrive.Unlock()
 }
 
 func (pass *Passenger) unboard() {
-	defer pass.cp.cond2Leave.L.Unlock()
+	defer pass.cp.mu2Leave.Unlock()
 
-	pass.cp.cond2Leave.Wait()
+	fmt.Printf("Passenger %s is trying to leave\n", pass.id)
+
+	pass.cp.mu2Leave.Lock()
 
 	pass.cp.passengerMutex.Lock()
 	pass.cp.passengers = RemoveFromQueue(pass.cp.passengers, pass.id)
@@ -79,30 +97,41 @@ func (pass *Passenger) unboard() {
 
 	pass.cp.left++
 
+	fmt.Printf("Passenger %s left\n", pass.id)
+
 	if pass.cp.left == pass.cp.capacity {
 		pass.cp.isRunning = false
 		pass.cp.left = 0
+
+		pass.cp.load()
+
+		fmt.Println("The last passenger left, accepting new rides...")
+
+		go pass.cp.run()
 	}
 }
 
 func main() {
 	mu2Arrive := sync.Mutex{}
-	cond2Arrive := sync.NewCond(&mu2Arrive)
 	mu2Leave := sync.Mutex{}
-	cond2Leave := sync.NewCond(&mu2Leave)
 	muRun := sync.Mutex{}
 	condRun := sync.NewCond(&muRun)
 	var passengers []*Passenger
 	passengersMutex := sync.Mutex{}
 
-	CP := CarPool{10, 0, 0,  false, passengers, &passengersMutex, cond2Arrive, cond2Leave, condRun}
+	CP := CarPool{10, 0, 0, false, passengers, &passengersMutex, &mu2Arrive, &mu2Leave, condRun}
 	go CP.run()
 
 	scanner := bufio.NewScanner(os.Stdin)
 
 	id := 0
 	for true {
-		println("Enter if you want to board (B), unboard (U) or press q to quit:")
+		if len(CP.passengers) > 0 {
+			println("Enter if you want to board (B), unboard (U) or press q to quit:")
+		} else {
+			println("Enter if you want to board (B) or press q to quit:")
+		}
+
 		scanner.Scan()
 		usrText := scanner.Text()
 		if usrText == "q" {
@@ -123,7 +152,7 @@ func main() {
 				id++
 			}
 
-		} else if strings.ToLower(usrText) == "u" {
+		} else if len(CP.passengers) > 0 && strings.ToLower(usrText) == "u" {
 			println("Enter the id of the passengers to unboard, or A to unboard all")
 			println("Current passengers id:")
 			for _, passenger := range CP.passengers {
@@ -139,11 +168,18 @@ func main() {
 					CP.passengers[0].unboard()
 				}
 			} else {
+				idFound := false
+
 				for i := 0; i < len(CP.passengers); i++ {
 					if CP.passengers[i].id == usrText {
 						CP.passengers[i].unboard()
+						idFound = true
 						break
 					}
+				}
+
+				if !idFound {
+					println("Passenger ID not found, try again...")
 				}
 			}
 

@@ -31,6 +31,7 @@ func (cp *CarPool) run() {
 
 	cp.condRun.L.Lock()
 
+	// check if car is full, if it is, starts ride
 	for cp.arrived < cp.capacity {
 		cp.condRun.Wait()
 	}
@@ -57,6 +58,7 @@ type Passenger struct {
 }
 
 func (pass *Passenger) board() {
+	// check if car is running
 	if pass.cp.isRunning {
 		println("Car is on his way, it is not possible to get in!")
 		return
@@ -65,12 +67,14 @@ func (pass *Passenger) board() {
 	fmt.Printf("Passenger %s is trying to get in\n", pass.id)
 	pass.cp.mu2Arrive.Lock()
 
+	// checks if car is full (we need to check this after getting the lock)
 	if pass.cp.arrived >= pass.cp.capacity {
 		println("The car is full! Entering is not possible")
 		pass.cp.mu2Arrive.Unlock()
 		return
 	}
 
+	// appends this passenger to the list (the lock here is to synchronize the list)
 	pass.cp.passengerMutex.Lock()
 	pass.cp.passengers = append(pass.cp.passengers, pass)
 	pass.cp.passengerMutex.Unlock()
@@ -79,6 +83,8 @@ func (pass *Passenger) board() {
 
 	fmt.Printf("Passenger %s entered\n", pass.id)
 
+	// every passenger tells that he entered (in real world, we can think as telling he/she is properly seated)
+	// but the car is the one to "count" the passengers and resolve when to start the ride
 	pass.cp.condRun.Broadcast()
 
 	pass.cp.mu2Arrive.Unlock()
@@ -91,6 +97,7 @@ func (pass *Passenger) unboard() {
 
 	pass.cp.mu2Leave.Lock()
 
+	// removes this passenger from the list (the lock here is to synchronize the list)
 	pass.cp.passengerMutex.Lock()
 	pass.cp.passengers = RemoveFromQueue(pass.cp.passengers, pass.id)
 	pass.cp.passengerMutex.Unlock()
@@ -99,6 +106,7 @@ func (pass *Passenger) unboard() {
 
 	fmt.Printf("Passenger %s left\n", pass.id)
 
+	// when every one has left the car, the car can start a new ride
 	if pass.cp.left == pass.cp.capacity {
 		pass.cp.isRunning = false
 		pass.cp.left = 0

@@ -20,7 +20,7 @@ public class Server {
 		try {
 			sSocket = new ServerSocket(SERVER_PORT);
 		} catch (IOException e) { 
-			cOut.println("Não foi possível iniciar o servidor :(");	
+			cOut.println("Nï¿½o foi possï¿½vel iniciar o servidor :(");	
 			System.exit(-1);
 		}
 	
@@ -56,7 +56,7 @@ class AcceptClientThread extends Thread {
 			br = new BufferedReader(new InputStreamReader(is));
 			pw = new PrintWriter(socket.getOutputStream());			
 		} catch (IOException e) {
-			System.err.println("Não foi possível pegar as informações sobre o cliente :( "+e.getMessage());
+			System.err.println("Nï¿½o foi possï¿½vel pegar as informaï¿½ï¿½es sobre o cliente :( "+e.getMessage());
 			return;
 		}
 		
@@ -75,10 +75,10 @@ class AcceptClientThread extends Thread {
 				
 				if (data.toLowerCase() == "q") return;
 				
-				pw.println("Você digitou: "+data);
+				pw.println("Vocï¿½ digitou: "+data);
 				pw.flush();
 			} catch (IOException e) {
-				System.err.println("Erro na transmissão dos dados :(");
+				System.err.println("Erro na transmissï¿½o dos dados :(");
 				return;
 			}
 		}

@@ -12,6 +12,6 @@ public class ServerProgram {
         
         var server = new Server(port);
         server.run();
-        System.out.printf("Servidor escutando na porta %d", port);
+        System.out.println("Servidor escutando na porta %d".formatted(port));
     }
 }

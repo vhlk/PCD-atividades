@@ -30,13 +30,16 @@ public class Server extends Thread{
     
                 String receivedMessage = new String(request.getData(), "UTF-8");
                 String message = String.format("Porta %d enviou: %s", request.getPort(), receivedMessage);
-                
+                System.out.println(message);
+
                 byte[] messageToSend = message.getBytes();
 
                 for (User user : this.activedUser) {
                     DatagramPacket response = new DatagramPacket(messageToSend, messageToSend.length, user.getUserAdress(), user.getUserPort());
                     socket.send(response);
                 }
+
+                Thread.sleep(1000);
             }
         } catch (Exception e) {
             System.out.println("Error ao inciar o servidor: %s".formatted(e.getMessage()));

@@ -13,7 +13,7 @@ public class Client {
         System.out.println("Digite uma porta para se comunicar");
 
         Scanner scanner = new Scanner(System.in);
-        int port = scanner.nextInt();
+        int port = scanner.nextInt(); scanner.nextLine();
 
         try {
             InetAddress address = InetAddress.getByName(host);

@@ -5,12 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class Cliente {
 	private static final int SERVER_PORT = 8888;
+	protected static final PrintStream cout = System.out;
 
 	public static void main(String[] args) {
 		Socket socket = null; 
@@ -23,13 +26,18 @@ public class Cliente {
 		
 		PrintWriter pw = null;
 		try {
+			Scanner in = new Scanner(System.in);
+			cout.println("Digite o primeiro numero:");
+			int primeiroNum = in.nextInt(); in.nextLine();
+			cout.println("Digite o segundo numero:");
+			int segundoNum = in.nextInt(); in.nextLine();
 			pw = new PrintWriter(socket.getOutputStream());
-			pw.println("abcdef");
+			pw.println(primeiroNum);
+			pw.println(segundoNum);
 			pw.flush();
 			
 		} catch (IOException e) {	
 			System.err.println("Erro ao enviar a mensagem! "+e.getMessage());
-			return;
 		}
 		
 		InputStream is = null;
@@ -40,7 +48,6 @@ public class Cliente {
 			System.out.println(br.readLine());
 		} catch (IOException e) { 
 			System.err.println("Erro ao receber mensagem! "+e.getMessage());
-			return;
 		}
 		
 		try {

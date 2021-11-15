@@ -56,31 +56,21 @@ class AcceptClientThread extends Thread {
 			br = new BufferedReader(new InputStreamReader(is));
 			pw = new PrintWriter(socket.getOutputStream());			
 		} catch (IOException e) {
-			System.err.println("N�o foi poss�vel pegar as informa��es sobre o cliente :( "+e.getMessage());
+			System.err.println("Nao foi possivel pegar as informacoes sobre o cliente :( "+e.getMessage());
 			return;
 		}
 		
-		String data = "";
-		
-		while (true) {
-			try {
-				data = br.readLine();
-				
-				if (data == null || data == "") {
-					pw.println("Erro!");
-					continue;
-				}
-				
-				System.out.println("Recebido: "+data);
-				
-				if (data.toLowerCase() == "q") return;
-				
-				pw.println("Voc� digitou: "+data);
-				pw.flush();
-			} catch (IOException e) {
-				System.err.println("Erro na transmiss�o dos dados :(");
-				return;
-			}
+		try {
+			int primeiroNum = Integer.parseInt(br.readLine());
+			int segundoNum = Integer.parseInt(br.readLine());
+			
+			System.out.println("Recebido: "+primeiroNum+"+"+segundoNum);
+			
+			pw.println("Soma = "+(primeiroNum+segundoNum));
+			pw.flush();
+		} catch (IOException e) {
+			System.err.println("Erro na transmissao dos dados :(");
+			return;
 		}
 	}
 }

@@ -9,7 +9,6 @@ public class Benchmark {
 		Thread serverThread = new Thread() {
 			public void run() {
 				Server.main(args);
-				super.run();
 			}
 		};
 		serverThread.start();

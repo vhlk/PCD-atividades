@@ -1,17 +1,11 @@
 package udp;
 
-import java.util.Scanner;
-
 public class ServerProgram {
-    public static void main(String[] args) {
-        System.out.println("Escolha uma porta para o servidor executar");
-    
-        Scanner scanner = new Scanner(System.in);
-        int port = scanner.nextInt();
-        scanner.close();
-        
-        var server = new Server(port);
+	private static final int SERVER_PORT = 8888;
+	
+    public static void main(String[] args) {        
+        var server = new Server(SERVER_PORT);
         server.run();
-        System.out.println("Servidor escutando na porta %d".formatted(port));
+        System.out.println("Servidor escutando na porta %d".formatted(SERVER_PORT));
     }
 }

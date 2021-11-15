@@ -32,10 +32,14 @@ public class Server extends Thread{
                 checkUserForAdd(request.getAddress(), port);
     
                 String receivedMessage = new String(request.getData(), "UTF-8");
-                String message = String.format("Messagem recebida: %s", receivedMessage);
-                System.out.println(message);
+                String numeros[] = receivedMessage.split(" ");
+                int primeiroNum = Integer.parseInt(numeros[0]);
+                int segundoNum = Integer.parseInt(numeros[1].trim());
+                System.out.println("Recebido: "+primeiroNum+"+"+segundoNum);
 
-                // byte[] messageToSend = message.getBytes();
+                byte[] messageToSend = ("Soma = "+(primeiroNum+segundoNum)).getBytes();
+                DatagramPacket response = new DatagramPacket(messageToSend, messageToSend.length, request.getAddress(), request.getPort());
+                socket.send(response);
 
                 sleep(1000);
                 buffer = new byte[512];

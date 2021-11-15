@@ -6,39 +6,43 @@ import java.net.InetAddress;
 import java.util.Scanner;
 
 public class Client {
+	private static final int SERVER_PORT = 8888;
+	
     public static void main(String[] args) {
         
         String host = "localhost";
-
-        System.out.println("Digite uma porta para se comunicar");
-
-        Scanner scanner = new Scanner(System.in);
-        int port = scanner.nextInt(); scanner.nextLine();
+        
+        Scanner in = new Scanner(System.in);
 
         try {
             InetAddress address = InetAddress.getByName(host);
             DatagramSocket socket = new DatagramSocket();
-            
-            System.out.println("Digite 'quit' a qualquer momento para encerrar a conversa");
 
             while (true) {
-                System.out.println("Digite uma mensagem para enviar:");
-                String message = scanner.nextLine();
+            	System.out.println("Digite o primeiro numero ou quit para finalizar:");
+            	String intent = in.nextLine();
+            	if (intent.equals("q") || intent.equals("quit")) break;
+            	
+    			int primeiroNum = Integer.parseInt(intent);
+    			System.out.println("Digite o segundo numero:");
+    			int segundoNum = in.nextInt(); in.nextLine();
 
-                if(message.contains("quit")){
-                    break;
-                }
-
-                byte[] messageToByte = message.getBytes();
+                byte[] messageToByte = (primeiroNum+" "+segundoNum).getBytes();
             
-                DatagramPacket request = new DatagramPacket(messageToByte, messageToByte.length, address, port);
+                DatagramPacket request = new DatagramPacket(messageToByte, messageToByte.length, address, SERVER_PORT);
                 socket.send(request);
+                
+                byte[] buffer = new byte[512];
+                DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+                socket.receive(response);
+                
+                System.out.println(new String(buffer));
             }
             socket.close();
 
         } catch (Exception e) {
             System.out.println("Um erro ocorreu: %d".formatted(e.getMessage()));
-            scanner.close();
+            in.close();
         }
     }
 }

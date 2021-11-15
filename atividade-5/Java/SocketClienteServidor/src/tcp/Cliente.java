@@ -28,7 +28,7 @@ public class Cliente {
 			pw.flush();
 			
 		} catch (IOException e) {	
-			System.err.println("Erro ao enviar a mensagem!");
+			System.err.println("Erro ao enviar a mensagem! "+e.getMessage());
 			return;
 		}
 		
@@ -39,7 +39,7 @@ public class Cliente {
 			br = new BufferedReader(new InputStreamReader(is));
 			System.out.println(br.readLine());
 		} catch (IOException e) { 
-			System.err.println("Erro ao receber mensagem!");
+			System.err.println("Erro ao receber mensagem! "+e.getMessage());
 			return;
 		}
 		

@@ -20,7 +20,7 @@ public class Server {
 		try {
 			sSocket = new ServerSocket(SERVER_PORT);
 		} catch (IOException e) { 
-			cOut.println("N�o foi poss�vel iniciar o servidor :(");	
+			cOut.println("Nao foi possivel iniciar o servidor :( " + e.getMessage());	
 			System.exit(-1);
 		}
 	

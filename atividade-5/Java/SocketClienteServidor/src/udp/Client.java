@@ -1,8 +1,14 @@
 package udp;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
@@ -45,4 +51,30 @@ public class Client {
             in.close();
         }
     }
+    
+    public static void runWithouUserInteraction() throws IOException {
+    	String host = "localhost";
+        
+        Scanner in = new Scanner(System.in);
+
+        try {
+            InetAddress address = InetAddress.getByName(host);
+            DatagramSocket socket = new DatagramSocket();
+
+            byte[] messageToByte = (1+" "+2).getBytes();
+        
+            DatagramPacket request = new DatagramPacket(messageToByte, messageToByte.length, address, SERVER_PORT);
+            socket.send(request);
+            
+            byte[] buffer = new byte[512];
+            DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+            socket.receive(response);
+            
+            socket.close();
+
+        } catch (Exception e) {
+            System.err.println("Um erro ocorreu: %d".formatted(e.getMessage()));
+            in.close();
+        }
+	}
 }

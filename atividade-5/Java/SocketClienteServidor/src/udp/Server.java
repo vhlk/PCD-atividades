@@ -41,7 +41,7 @@ public class Server extends Thread{
                 DatagramPacket response = new DatagramPacket(messageToSend, messageToSend.length, request.getAddress(), request.getPort());
                 socket.send(response);
 
-                sleep(1000);
+                //sleep(1000);
                 buffer = new byte[512];
             }
         } catch (Exception e) {

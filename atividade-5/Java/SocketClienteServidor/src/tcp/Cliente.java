@@ -35,6 +35,7 @@ public class Cliente {
 			pw.println(primeiroNum);
 			pw.println(segundoNum);
 			pw.flush();
+			in.close();
 			
 		} catch (IOException e) {	
 			System.err.println("Erro ao enviar a mensagem! "+e.getMessage());
@@ -52,8 +53,28 @@ public class Cliente {
 		
 		try {
 			socket.close();
+			pw.close();
+			br.close();
 		} catch (IOException ignored) { }
 		
+	}
+	
+	public static void runWithouUserInteraction() throws IOException {
+		Socket socket = new Socket("localhost", SERVER_PORT);
+		socket.setReuseAddress(true);
+		
+		PrintWriter pw = new PrintWriter(socket.getOutputStream());
+		pw.println(1);
+		pw.println(2);
+		pw.flush();
+		
+		InputStream is = socket.getInputStream();
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		br.readLine();
+		
+		socket.close();
+		pw.close();
+		br.close();
 	}
 
 }

@@ -12,21 +12,21 @@ public class Benchmark {
 			}
 		};
 		serverThread.start();
-		
-		long allTimes = 0;
+
+		long t1 = System.nanoTime();
 		for (int i = 0; i < sNumRepetitions; i++) {
-			long t1 = System.nanoTime();
 			try {
 				Cliente.runWithouUserInteraction();
 			} catch (IOException e) {
 				System.err.println("Erro no cliente "+i+": "+e.getMessage());
 			}
-			allTimes += System.nanoTime() - t1;
 		}
 		
-		double averageTime = (allTimes / sNumRepetitions);
+		long executionTime = System.nanoTime() - t1;
 		
-		System.out.println("Tempo medio: "+averageTime+"ns"); // Tempo medio: 791840.0ns
+		double averageTime = (executionTime / sNumRepetitions);
+		
+		System.out.println("Tempo medio: "+averageTime+"ns"); // 763487.0ns, 830769.0ns, 811971.0ns
 	}
 
 }

@@ -10,20 +10,19 @@ public class Benchmark {
 		Server server = new Server(SERVER_PORT);
 		server.start();
 		
-		long allTimes = 0;
+		long t1 = System.nanoTime();
 		for (int i = 0; i < sNumRepetitions; i++) {
-			long t1 = System.nanoTime();
 			try {
 				Client.runWithouUserInteraction();
 			} catch (IOException e) {
 				System.err.println("Erro no cliente "+i+": "+e.getMessage());
 			}
-			allTimes += System.nanoTime() - t1;
 		}
+		long executionTime = System.nanoTime() - t1;
 		
-		double averageTime = (allTimes / sNumRepetitions);
+		double averageTime = (executionTime / sNumRepetitions);
 		
-		System.out.println("Tempo medio: "+averageTime+"ns"); // Tempo medio: 420735.0ns
+		System.out.println("Tempo medio: "+averageTime+"ns"); // Tempo medio: 420735.0ns, 402675.0ns, 395403.0ns
 	}
 
 }

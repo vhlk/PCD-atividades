@@ -46,29 +46,40 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
-	println("Type the first number you want to add or 'q' to quit:")
-	scanner.Scan()
-	usrText := scanner.Text()
-	if usrText == "q" {
-		os.Exit(0)
+	for {
+		println("Type the first number or 'q' to quit:")
+		scanner.Scan()
+		usrText := scanner.Text()
+		if usrText == "q" {
+			os.Exit(0)
+		}
+
+		firstNumber, _ := strconv.Atoi(usrText)
+
+
+		println("Type the operation you want to do or 'q' to quit:")
+		scanner.Scan()
+		operation := scanner.Text()
+		if operation == "q" {
+			os.Exit(0)
+		}
+
+		println("Type the second number or 'q' to quit:")
+		scanner.Scan()
+		usrText = scanner.Text()
+		if usrText == "q" {
+			os.Exit(0)
+		}
+
+		secondNumber, _ := strconv.Atoi(usrText)
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		r, err := c.Calc(ctx, &pb.NumbersRequest{First: int32(firstNumber), Second: int32(secondNumber), Operation: operation})
+		if err != nil {
+			log.Fatalf("could not greet: %v", err)
+		}
+		log.Printf("Result: %d", r.GetResult())
+
+		cancel()
 	}
-
-	firstNumber, _ := strconv.Atoi(usrText)
-
-	println("Type the second number you want to add or 'q' to quit:")
-	scanner.Scan()
-	usrText = scanner.Text()
-	if usrText == "q" {
-		os.Exit(0)
-	}
-
-	secondNumber, _ := strconv.Atoi(usrText)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	r, err := c.Calc(ctx, &pb.NumbersRequest{First: int32(firstNumber), Second: int32(secondNumber)})
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
-	}
-	log.Printf("Result: %d", r.GetResult())
 }

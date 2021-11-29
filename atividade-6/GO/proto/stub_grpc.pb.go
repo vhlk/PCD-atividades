@@ -32,7 +32,7 @@ func NewCalcSocketClient(cc grpc.ClientConnInterface) CalcSocketClient {
 
 func (c *calcSocketClient) Calc(ctx context.Context, in *NumbersRequest, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/helloworld.CalcSocket/Calc", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.CalcSocket/Calc", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func _CalcSocket_Calc_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/helloworld.CalcSocket/Calc",
+		FullMethod: "/proto.CalcSocket/Calc",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CalcSocketServer).Calc(ctx, req.(*NumbersRequest))
@@ -90,7 +90,7 @@ func _CalcSocket_Calc_Handler(srv interface{}, ctx context.Context, dec func(int
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CalcSocket_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "helloworld.CalcSocket",
+	ServiceName: "proto.CalcSocket",
 	HandlerType: (*CalcSocketServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -99,5 +99,5 @@ var CalcSocket_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "stub.proto",
+	Metadata: "proto/stub.proto",
 }

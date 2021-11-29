@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net"
 
@@ -20,8 +21,23 @@ type server struct {
 
 // Calc implements helloworld.GreeterServer
 func (s *server) Calc(ctx context.Context, in *pb.NumbersRequest) (*pb.Response, error) {
-	log.Printf("Received: %d + %d", in.GetFirst(), in.GetSecond())
-	return &pb.Response{Result: in.GetFirst() + in.GetSecond()}, nil
+	log.Printf("Received: %d %v %d", in.GetFirst(), in.GetOperation() , in.GetSecond())
+
+	if in.GetOperation() == "+" {
+		return &pb.Response{Result: in.GetFirst() + in.GetSecond()}, nil
+	} else if in.GetOperation() == "-" {
+		return &pb.Response{Result: in.GetFirst() - in.GetSecond()}, nil
+	} else if in.GetOperation() == "*" {
+		return &pb.Response{Result: in.GetFirst() * in.GetSecond()}, nil
+	} else if in.GetOperation() == "/" {
+		if in.GetSecond() == 0 {
+			return &pb.Response{}, errors.New("0 division")
+		}
+		return &pb.Response{Result: in.GetFirst() / in.GetSecond()}, nil
+	}
+
+
+	return &pb.Response{}, errors.New("operation not found")
 }
 
 func main() {

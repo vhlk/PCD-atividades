@@ -19,7 +19,7 @@ option java_multiple_files = true;
 option java_package = "io.grpc.examples.servercalc";
 option java_outer_classname = "ServerCalcProto";
 
-package helloworld;
+package proto;
 
 // The server service definition.
 service CalcSocket {
@@ -31,6 +31,12 @@ service CalcSocket {
 message NumbersRequest {
   int32 first = 1;
   int32 second = 2;
+  string operation = 3;
+}
+
+// The request message containing the number to sum
+message OperationRequest {
+  string operation = 1;
 }
 
 // The response message containing the result

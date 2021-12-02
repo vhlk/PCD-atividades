@@ -21,8 +21,6 @@ type server struct {
 
 // Calc implements helloworld.GreeterServer
 func (s *server) Calc(ctx context.Context, in *pb.NumbersRequest) (*pb.Response, error) {
-	log.Printf("Received: %d %v %d", in.GetFirst(), in.GetOperation() , in.GetSecond())
-
 	if in.GetOperation() == "+" {
 		return &pb.Response{Result: in.GetFirst() + in.GetSecond()}, nil
 	} else if in.GetOperation() == "-" {

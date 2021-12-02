@@ -99,5 +99,5 @@ var CalcSocket_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/stub.proto",
+	Metadata: "stub.proto",
 }

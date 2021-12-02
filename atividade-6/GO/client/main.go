@@ -54,7 +54,7 @@ func main() {
 			os.Exit(0)
 		}
 
-		firstNumber, _ := strconv.Atoi(usrText)
+		firstNumber, _ := strconv.ParseFloat(usrText, 64)
 
 
 		println("Type the operation you want to do or 'q' to quit:")
@@ -64,6 +64,11 @@ func main() {
 			os.Exit(0)
 		}
 
+		if operation != "+" && operation != "-" && operation != "/" && operation != "*" {
+			println("Operacao indisponível")
+			continue
+		}
+
 		println("Type the second number or 'q' to quit:")
 		scanner.Scan()
 		usrText = scanner.Text()
@@ -71,14 +76,14 @@ func main() {
 			os.Exit(0)
 		}
 
-		secondNumber, _ := strconv.Atoi(usrText)
+		secondNumber, _ := strconv.ParseFloat(usrText, 64)
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		r, err := c.Calc(ctx, &pb.NumbersRequest{First: int32(firstNumber), Second: int32(secondNumber), Operation: operation})
+		r, err := c.Calc(ctx, &pb.NumbersRequest{First: firstNumber, Second: secondNumber, Operation: operation})
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)
 		}
-		log.Printf("Result: %d", r.GetResult())
+		log.Printf("Result: %.2f", r.GetResult())
 
 		cancel()
 	}

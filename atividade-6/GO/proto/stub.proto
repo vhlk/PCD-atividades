@@ -29,17 +29,11 @@ service CalcSocket {
 
 // The request message containing the number to sum
 message NumbersRequest {
-  int32 first = 1;
-  int32 second = 2;
+  double first = 1;
+  double second = 2;
   string operation = 3;
 }
-
-// The request message containing the number to sum
-message OperationRequest {
-  string operation = 1;
-}
-
 // The response message containing the result
 message Response {
-  int32 result = 1;
+  double result = 1;
 }

@@ -63,22 +63,30 @@ sourceSets {
 
 startScripts.enabled = false
 
-task helloWorldServer(type: CreateStartScripts) {
-    mainClassName = 'io.grpc.examples.helloworld.HelloWorldServer'
-    applicationName = 'hello-world-server'
+task client(type: CreateStartScripts) {
+    mainClassName = 'io.grpc.examples.calcsocket.Client'
+    applicationName = 'client'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath
 }
 
-task helloWorldClient(type: CreateStartScripts) {
-    mainClassName = 'io.grpc.examples.helloworld.HelloWorldClient'
-    applicationName = 'hello-world-client'
+task server(type: CreateStartScripts) {
+    mainClassName = 'io.grpc.examples.calcsocket.Server'
+    applicationName = 'server'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+task benchmark(type: CreateStartScripts) {
+    mainClassName = 'io.grpc.examples.calcsocket.BenchmarkClass'
+    applicationName = 'benchmark'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath
 }
 
 applicationDistribution.into('bin') {
-    from(helloWorldServer)
-    from(helloWorldClient)
+    from(client)
+    from(server)
+    from(benchmark)
     fileMode = 0755
 }

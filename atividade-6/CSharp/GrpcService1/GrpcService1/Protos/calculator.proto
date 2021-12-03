@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcService1";
+
+package calculator;
+
+// The calculator service definition.
+service CalcSocket {
+  // Creates a calculator
+  rpc Calc (NumbersRequest) returns (Response) {}
+}
+
+// The request message containing the number to sum
+message NumbersRequest {
+  double first = 1;
+  double second = 2;
+  string operation = 3;
+}
+// The response message containing the result
+message Response {
+  double result = 1;
+}

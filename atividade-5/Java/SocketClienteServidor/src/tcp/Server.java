@@ -7,24 +7,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
 	private static final int SERVER_PORT = 8888; 
-	private static boolean stopServer = false;
+	public static boolean stopServer = false;
 	protected static final PrintStream cOut = System.err;
 
 	public static void main(String[] args) {
 		ServerSocket sSocket = null;
-		try {
+
+		try {			
 			sSocket = new ServerSocket(SERVER_PORT);
-		} catch (IOException e) { 
-			cOut.println("Nao foi possivel iniciar o servidor :( " + e.getMessage());	
-			System.exit(-1);
+		} catch (IOException e) {
+			cOut.println("Erro ao iniciar servidor :( " + e.getMessage());
 		}
-	
-		while (true && !stopServer) {
+
+		while (!stopServer) {
 			Socket cSocket = null;
 			try {
 				cSocket = sSocket.accept();
@@ -64,7 +65,7 @@ class AcceptClientThread extends Thread {
 			int primeiroNum = Integer.parseInt(br.readLine());
 			int segundoNum = Integer.parseInt(br.readLine());
 			
-			System.out.println("Recebido: "+primeiroNum+"+"+segundoNum);
+			// System.out.println("Recebido: "+primeiroNum+"+"+segundoNum);
 			
 			pw.println("Soma = "+(primeiroNum+segundoNum));
 			pw.flush();

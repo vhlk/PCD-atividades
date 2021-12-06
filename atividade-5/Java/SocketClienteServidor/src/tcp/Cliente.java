@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -59,7 +61,6 @@ public class Cliente {
 	
 	public static void runWithouUserInteraction() throws IOException {
 		Socket socket = new Socket("localhost", SERVER_PORT);
-		socket.setReuseAddress(true);
 		
 		PrintWriter pw = new PrintWriter(socket.getOutputStream());
 		pw.println(1);
@@ -70,6 +71,7 @@ public class Cliente {
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		br.readLine();
 		
+		socket.setSoLinger(true, 0);
 		socket.close();
 		pw.close();
 		br.close();

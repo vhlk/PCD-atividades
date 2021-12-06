@@ -22,6 +22,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -32,10 +33,22 @@ import (
 )
 
 const (
-	address     = "localhost:8888"
+	address    = "localhost:8888"
+	numClients = 2
 )
 
 func main() {
+	for i := 0; i < numClients-1; i++ {
+		go RunWithoutInteraction()
+	}
+
+	go RunWithoutInteractionTimer()
+
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+
+	os.Exit(0)
+
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -44,7 +57,7 @@ func main() {
 	defer conn.Close()
 	c := pb.NewCalcSocketClient(conn)
 
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner = bufio.NewScanner(os.Stdin)
 
 	for {
 		println("Type the first number or 'q' to quit:")
@@ -55,7 +68,6 @@ func main() {
 		}
 
 		firstNumber, _ := strconv.ParseFloat(usrText, 64)
-
 
 		println("Type the operation you want to do or 'q' to quit:")
 		scanner.Scan()
@@ -87,4 +99,40 @@ func main() {
 
 		cancel()
 	}
+}
+
+func RunWithoutInteraction() {
+	// Set up a connection to the server.
+	for i := 0; i < 10_000; i++ {
+		conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+		if err != nil {
+			log.Fatalf("did not connect: %v", err)
+		}
+		defer conn.Close()
+		c := pb.NewCalcSocketClient(conn)
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		c.Calc(ctx, &pb.NumbersRequest{First: 1, Second: 1, Operation: "+"})
+
+		cancel()
+	}
+}
+
+func RunWithoutInteractionTimer() {
+	start := time.Now()
+	for i := 0; i < 10_000; i++ {
+		conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+		if err != nil {
+			log.Fatalf("did not connect: %v", err)
+		}
+		defer conn.Close()
+		c := pb.NewCalcSocketClient(conn)
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		c.Calc(ctx, &pb.NumbersRequest{First: 1, Second: 1, Operation: "+"})
+
+		cancel()
+	}
+
+	fmt.Print("Time taken: ", time.Since(start).Nanoseconds(), "\n")
 }

@@ -22,7 +22,7 @@ public class Server extends Thread{
         try {
             this.socket = new DatagramSocket(this.port);
             byte[] buffer = new byte[512];
-            System.out.println("Servidor executando na porta %d, aguardando mensagens...".formatted(this.port));
+            // System.out.println("Servidor executando na porta %d, aguardando mensagens...".formatted(this.port));
             DatagramPacket request;
 
             while(true) {
@@ -35,7 +35,7 @@ public class Server extends Thread{
                 String numeros[] = receivedMessage.split(" ");
                 int primeiroNum = Integer.parseInt(numeros[0]);
                 int segundoNum = Integer.parseInt(numeros[1].trim());
-                System.out.println("Recebido: "+primeiroNum+"+"+segundoNum);
+                // System.out.println("Recebido: "+primeiroNum+"+"+segundoNum);
 
                 byte[] messageToSend = ("Soma = "+(primeiroNum+segundoNum)).getBytes();
                 DatagramPacket response = new DatagramPacket(messageToSend, messageToSend.length, request.getAddress(), request.getPort());
